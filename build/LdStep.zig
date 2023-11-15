@@ -75,7 +75,7 @@ fn make(s: *Step, _: *std.Progress.Node) !void {
         try argv.appendSlice(&.{ "--oformat", @tagName(self.format) });
         break :bk argv;
     };
-    const ld_str = b.fmt("{s}-elf-ld", .{self.arch.genericName()});
+    const ld_str = b.fmt("{s}-elf-ld", .{self.arch.binaryName()});
     const ld_path = b.findProgram(
         &.{ld_str},
         &.{},

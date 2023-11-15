@@ -1,5 +1,4 @@
-
+#include <drivers/vga.h>
 void main() {
-  unsigned char* buffer = (unsigned char*)0xb8000;
-  *buffer = 'X';
+  print_x();
 }

@@ -51,12 +51,17 @@ fn make(s: *Step, _: *std.Progress.Node) !void {
     const full_input_path = self.file_path.getPath(b);
     var man = b.cache.obtain();
     defer man.deinit();
-    const gcc_str = std.fmt.allocPrint(arena, "{s}-elf-gcc", .{self.arch.genericName()}) catch @panic("OOM");
+    const gcc_str = std.fmt.allocPrint(arena, "{s}-elf-gcc", .{self.arch.binaryName()}) catch @panic("OOM");
     const gcc_path = b.findProgram(&.{gcc_str}, &.{}) catch @panic("appropreate gcc binary not found");
 
     var argv = ArrayList([]const u8).init(arena);
     try argv.append(gcc_path);
     common.createFlag(&argv, 'f', "freestanding", arena);
+    if (self.include_dir) |d| {
+        const full_include_path = try b.build_root.join(b.allocator, &.{d});
+        common.createFlag(&argv, 'I', "", arena);
+        try argv.append(full_include_path);
+    }
     try argv.appendSlice(&.{
         "-c",
         full_input_path,
