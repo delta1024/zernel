@@ -57,6 +57,7 @@ fn make(s: *Step, _: *std.Progress.Node) !void {
     var argv = ArrayList([]const u8).init(arena);
     try argv.append(gcc_path);
     common.createFlag(&argv, 'f', "freestanding", arena);
+    try argv.append("-std=gnu99");
     if (self.include_dir) |d| {
         const full_include_path = try b.build_root.join(b.allocator, &.{d});
         common.createFlag(&argv, 'I', "", arena);

@@ -1,4 +1,6 @@
 #include <drivers/vga.h>
-void main() {
-  print_x();
+
+void kmain() {
+  terminal_initialize();
+  terminal_write_string("Hello, kernel World\n");
 }
