@@ -1,6 +1,7 @@
 #include <drivers/vga.h>
 
 void kmain() {
-  terminal_initialize();
-  terminal_write_string("Hello, kernel World\n");
+  vga_terminal_t terminal;
+  terminal_initialize(&terminal);
+  terminal_write_string(&terminal, "Hello, kernel World!\n");
 }
