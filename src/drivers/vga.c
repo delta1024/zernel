@@ -18,6 +18,16 @@ size_t strlen(const char* str) {
   return len;
 }
 
+void mem_copy(const vga_entry_t* src, vga_entry_t* dest, size_t size) {
+  for (int i = 0; i < size; i++) {
+    *(dest + i) = *(src + i);
+  }
+}
+void mem_set(vga_entry_t* dest, vga_entry_t data, size_t size) {
+  for (int i = 0; i < size; i++){
+    *(dest + i) = data;
+  }
+}
 void terminal_initialize(vga_terminal_t* terminal) {
   terminal->column = 0;
   terminal->row = 0;
@@ -38,11 +48,11 @@ void terminal_put_char(vga_terminal_t* terminal,char c) {
     return;
   }
  
-  terminal_put_entry_at(terminal,c);
+  terminal_put_entry_at(terminal, c);
   if (++terminal->column == VGA_WIDTH) {
     terminal->column = 0;
     if (++terminal->row == VGA_HEIGH)
-      terminal->row = 0;
+      terminal_scroll(terminal);
   }
 }
 
@@ -61,13 +71,28 @@ void terminal_write_nl(vga_terminal_t* terminal) {
     terminal->row = 0;
   set_cursor(terminal_get_offset(terminal));
 }
+void terminal_scroll(vga_terminal_t* terminal) {
+  int line_offset = GET_CHAR_POS(1, 0);
+  vga_entry_t* old_line = terminal->buffer + line_offset;
+  vga_entry_t* new_line = terminal->buffer;
+  for (int i = 0; i + 1 < VGA_HEIGH; i++) {
+    mem_copy(old_line, new_line, VGA_WIDTH);
+    old_line += line_offset;
+    new_line += line_offset;
+  }
+  if (terminal->row > 0) {
+    terminal->row -= 1;
+  }
+  set_cursor(terminal_get_offset(terminal));
+  mem_set(new_line, VGA_ENTRY(' ', terminal->color), VGA_WIDTH);
+    
+}
 vga_cursor_t terminal_get_offset(vga_terminal_t* terminal) {
     return 2 * GET_CHAR_POS(terminal->row, terminal->column);
 }
 
 void terminal_clear(vga_terminal_t* terminal) {
-  for (vga_entry_t i = 0; i < (VGA_WIDTH * VGA_HEIGH); i++)
-    terminal->buffer[i] = VGA_ENTRY(' ', terminal->color);
+  mem_set(terminal->buffer, VGA_ENTRY(' ', terminal->color), VGA_HEIGH * VGA_WIDTH);
   set_cursor(0);
 }
 void set_cursor(vga_cursor_t offset) {
@@ -85,8 +110,8 @@ vga_cursor_t get_cursor() {
   return offset * 2;
 }
 
-#undef  VGA_CTRL_REGISTER
-#undef	VGA_DATA_REGISTER
-#undef	VGA_OFFSET_LOW 
-#undef	VGA_OFFSET_HIGH 
+#undef VGA_CTRL_REGISTER
+#undef VGA_DATA_REGISTER
+#undef VGA_OFFSET_LOW 
+#undef VGA_OFFSET_HIGH 
 #undef GET_CHAR_POS

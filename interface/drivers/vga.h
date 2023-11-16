@@ -45,6 +45,7 @@ void terminal_put_char(vga_terminal_t* terminal,char c);
 void terminal_write(vga_terminal_t* terminal,const char* data, size_t size);
 void terminal_write_string(vga_terminal_t* terminal,const char* data);
 void terminal_clear(vga_terminal_t* terminal);
+void terminal_scroll(vga_terminal_t* terminal);
 /** moves the terminal position and cursor to a new line */
 void terminal_write_nl(vga_terminal_t* terminal);
 vga_cursor_t terminal_get_offset(vga_terminal_t* terminal);
@@ -56,9 +57,9 @@ void set_cursor(vga_cursor_t offset);
 /**
 returns the number of bytes written not the number of characters.
 if you are interfacing with video memory with a size greater than uint8_t
-you need to devide the result by 2.
+you need to divide the result by 2.
 */
 vga_cursor_t get_cursor();
 
 
-#endif // __DRIVIRS_IO_H__
+#endif // __DRIVIRS_VGA_H__
